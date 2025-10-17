@@ -88,7 +88,7 @@ pikachu.next_evo="raichu"
 for i in range(12):
     pikachu.entrenar()
 
-
+print("Angel gei")
 
 
     
