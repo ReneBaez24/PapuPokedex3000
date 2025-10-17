@@ -36,6 +36,7 @@ class Pokemon(Pokemon_Base):
     #cambiar esta wea    
     def actualizar(self):
         print("eldiablo")
+
     
     def detallesPokemon(self):
         print(f"\n nombre del pokemon {self.nombre} ")
@@ -78,8 +79,52 @@ class Pokemon(Pokemon_Base):
         self.defensa+=20
         self.vida+=20
 
-class Agua ():
-    pass
+class Agua (Pokemon_Base):# actualizar metodo
+    def __init__(self):
+        self.ataque_especial ="hidro bomba" 
+
+class Fuego(Pokemon_Base):# actualizar 
+    def __init__(self):
+        self.ataque_especial ="lanza llamas"
+    
+class Electrico(Pokemon_Base):# actualizar 
+    def __init__(self):
+        self.ataque_especial ="tacleada de vulteos "
+    
+class Planta(Pokemon_Base): # actualizar 
+    def __init__(self):
+        self.ataque_especial ="rallo solar😍"
+
+#clase de herenria multiple
+
+class Entrenamiento(ABC):
+    def __init__(self):
+        pass
+    @abstractmethod
+    def subirAtaque(self):
+        pass
+    @abstractmethod
+    def subirDefensa(self):
+        pass
+    @abstractmethod
+    def subirVida(self):
+        pass
+
+class Pokemon_Entrenamiento(Entrenamiento, Pokemon):
+    def __init__(self):
+        pass
+    def subirAtaque(self):
+        self.ataque += 20
+    def subirVida(self):
+        self.vida+= 20
+    def subirDefensa(self):
+        self.defensa += 20
+    
+
+
+    
+
+
 
 #pruebas
 pikachu=Pokemon()
@@ -88,9 +133,6 @@ pikachu.next_evo="raichu"
 for i in range(12):
     pikachu.entrenar()
 
-print("Angel gei")
 
-
-    
 
 
