@@ -126,8 +126,73 @@ class Pokemon_Entrenamiento(Entrenamiento, Pokemon):
         self.defensa += 20
     
 #(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0,vida=0,defensa=0,lvl=0,evolucion=1,next_evo="",last_evo="",atrapado=False):
-mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",True)
+mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
 mudkip.detallesPokemon()
+
+chimchar=Fuego("Chimchar","Macaco du Fogo",58,44,44,5,1,"Monferno","Infernape",False)
+chimchar.detallesPokemon()
+
+Zapdos=Electrico("Zapdos","Pajarraco Culiao",90,90,85,70,3,"","",False)
+Zapdos.detallesPokemon()
+
+Roserade=Planta("Roserade","Inserta musica de piano",125,60,105,74,3,"","",False)
+Roserade.detallesPokemon()
+
+nombrepacomon = input("Ingresa el nombre del enemigo: ")
+desc = input("Ingresa la descipcion del pokemnon: ")
+ata = int(input("Ingresa el ataque: "))
+vid = int(input("Ingresa la vida: "))
+defen = int(input("Ingresa el defensa: "))
+level = int(input("Ingresa el nivel: "))
+tipe = int(input("Cual es el tipo de pokemon?\n[1] Agua\n[2] Fuego\n[3]Electrico\n[4] Planta)"))
+des = int(input("Cuantas evoluciones tiene? "))
+
+if tipe == 1:
+    if des == 0:
+        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+    elif des == 1 :
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+    elif des == 2:
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+elif tipe == 2:
+    if des == 0:
+        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+    elif des == 1 :
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+    elif des == 2:
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+elif tipe == 3:
+    if des == 0:
+        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+    elif des == 1 :
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+    elif des == 2:
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+elif tipe == 4:
+    if des == 0:
+        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+    elif des == 1 :
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+    elif des == 2:
+        evo1 = input("Ingresa el nombre de la primera evolucion: ")
+        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+else:
+    print("Mi loco, elige una opcion valida")
+
+pacomonEnemigo.detallesPokemon()
+
+
 
 
 """
