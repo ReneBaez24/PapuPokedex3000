@@ -1,6 +1,7 @@
 #saquenme de latinoamerica
 
 from abc import ABC, abstractmethod
+import random 
 
 class Pokemon_Base(ABC):
     def __init__(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0
@@ -48,6 +49,13 @@ class Pokemon(Pokemon_Base):
         print(f"\n nivel del pokemon {self.lvl} ")
         print(f"\n evolucion del pokemon {self.evolucion} ")
         print(f"\n atrapado = {self.atrapado} ")
+
+    def detallesCombate(self):
+        print(f" nombre del pokemon {self.nombre} ")
+        print(f" ataque del pokemon {self.ataque} ")
+        print(f" vida del pokemon {self.vida} ")
+        print(f" defensa del pokemon {self.defensa} ")
+
 
     def entrenar(self):
         self.ataque+=10
@@ -124,7 +132,117 @@ class Pokemon_Entrenamiento(Entrenamiento, Pokemon):
         self.vida+= 20
     def subirDefensa(self):
         self.defensa += 20
+
+def Combate(pkmn1,pkmn2):
+
+
+    print(f"Pokemon {pkmn2.nombre} busca pelea! ")
+    print("detalles de tu pokemon")
+    pkmn1.detallesCombate()
+    print("detalles del pokemon rival")
+    pkmn2.detallesCombate()
+    faint = False
+    eleccion=0
+    vidaCombate1=pkmn1.vida
+    vidaCombate2=pkmn2.vida
+    while faint == False :
+                
+
+        print(f"{pkmn1.nombre}: HP [{vidaCombate1}]")
+        print(f"{pkmn2.nombre}: HP [{vidaCombate2}]")
+        huida=False
+        while eleccion == 0:
+            print(f"Opciones de combate ")
+            print(f"[1] Ataque normal")
+            print(f"[2] Ataque especial ")
+            print(f"[3] Pasar turno ")
+            print(f"[4] Huir ")
+            eleccion=int(input(""))
+
+            winner=""
+            if eleccion == 1:
+                print(f"{pkmn1.nombre} ataca! ")
+                dmg1=pkmn1.ataque - pkmn2.defensa
+                if dmg1<=0:
+                    dmg1=5
+                vidaCombate2-=dmg1
+                if vidaCombate2 <= 0:
+                    vidaCombate2 = 0
+                    winner=pkmn1.nombre
+                    break
+            elif eleccion == 2:
+                print(f"{pkmn1.nombre} realiza su ataque especial: {pkmn1.ataque_especial}! ")
+                dmg1=(pkmn1.ataque*1.5) - pkmn2.defensa
+
+                if dmg1<=0:
+                    dmg1=5
+                vidaCombate2-=dmg1
+                if vidaCombate2 <= 0:
+                    vidaCombate2 = 0
+                    winner=pkmn1.nombre
+                    break
+            elif eleccion == 3:
+                print(f"{pkmn1.nombre} descansa y recupera 5 hp")
+                vidaCombate1+=5
+            elif eleccion ==4:
+                huir=random.randrange(3)
+                if huir != 1:
+                    print(f"huiste de la batalla")
+                    huida=True
+                else:
+                    print("llora")
+
+        if huida == True:
+            faint= True
+            return
+        if vidaCombate2 > 0:
+            print(f"Turno del rival")
+            rivalwea=random.randrange(1,4)
+            if rivalwea ==1:
+                print(f"{pkmn2.nombre} ataca! ")
+                dmg2=pkmn2.ataque - pkmn1.defensa
+                if dmg2<=0:
+                    dmg2=5
+                vidaCombate1-=dmg2
+                if vidaCombate1 <= 0:
+                    vidaCombate1 = 0
+                    winner=pkmn2.nombre
+            elif rivalwea == 2:
+                    print(f"{pkmn2.nombre} realiza su ataque especial: {pkmn2.ataque_especial}! ")
+                    dmg2=(pkmn2.ataque*1.5) - pkmn1.defensa
+
+                    if dmg2<=0:
+                        dmg2=5
+                    vidaCombate1-=dmg2
+                    if vidaCombate1 <= 0:
+                        vidaCombate1 = 0
+                        winner=pkmn2.nombre
+            elif rivalwea == 3:
+                print(f"{pkmn2.nombre} descansa y recupera 5 hp")
+                vidaCombate2+=5
+
+        
+        eleccion=0    
+       
+        if vidaCombate2 == 0:
+            faint= True
+            print(f"El ganador del combate es {winner}")
+            if pkmn1.vida > pkmn2.vida :
+                print("Capturaste al pokemon!")
+                pkmn2.atrapado == True
+                pkmnlista.append(pkmn2)
+            else:
+                print("el pokemon se escapo (tu vida base era menor)")
+
+        elif vidaCombate1 == 0:  
+            faint= True
+            print(f"El ganador del combate es {winner}") 
+
+
+
+
     
+
 #(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0,vida=0,defensa=0,lvl=0,evolucion=1,next_evo="",last_evo="",atrapado=False):
 mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
 mudkip.detallesPokemon()
@@ -132,12 +250,26 @@ mudkip.detallesPokemon()
 chimchar=Fuego("Chimchar","Macaco du Fogo",58,44,44,5,1,"Monferno","Infernape",False)
 chimchar.detallesPokemon()
 
+pichu=Electrico("pichu","rata electrica",40,20,35,5,1,"pikachu","raichu",False)
+pichu.detallesPokemon()
+
+treeko=Planta("treeko","wea de planta",45,40,35,5,1,"pikachu","raichu",False)
+pichu.detallesPokemon()
+
+
+
 Zapdos=Electrico("Zapdos","Pajarraco Culiao",90,90,85,70,3,"","",False)
 Zapdos.detallesPokemon()
 
 Roserade=Planta("Roserade","Inserta musica de piano",125,60,105,74,3,"","",False)
 Roserade.detallesPokemon()
 
+pkmnlista= [mudkip,chimchar,pichu,treeko,Zapdos,Roserade]
+pkmnAtrapados= []
+
+Combate(Roserade,Zapdos)
+
+"""
 nombrepacomon = input("Ingresa el nombre del enemigo: ")
 desc = input("Ingresa la descipcion del pokemnon: ")
 ata = int(input("Ingresa el ataque: "))
@@ -191,7 +323,7 @@ else:
     print("Mi loco, elige una opcion valida")
 
 pacomonEnemigo.detallesPokemon()
-
+"""
 
 
 
