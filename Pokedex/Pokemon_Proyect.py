@@ -437,3 +437,9 @@ while des != 5:
             Combate(pkmnAtrapados[select-1],Crear_rival())
         else:
             print("Otra vez?")
+    elif des == 5:
+        print("adios joven hermoso")
+        break
+    else:
+        print("vales caca joven ")
+    
