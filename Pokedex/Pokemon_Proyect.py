@@ -230,7 +230,7 @@ def Combate(pkmn1,pkmn2):
             if pkmn1.vida > pkmn2.vida :
                 print("Capturaste al pokemon!")
                 pkmn2.atrapado == True
-                pkmnlista.append(pkmn2)
+                pkmnAtrapados.append(pkmn2)
             else:
                 print("el pokemon se escapo (tu vida base era menor)")
 
@@ -254,7 +254,7 @@ pichu=Electrico("pichu","rata electrica",40,20,35,5,1,"pikachu","raichu",False)
 pichu.detallesPokemon()
 
 treeko=Planta("treeko","wea de planta",45,40,35,5,1,"pikachu","raichu",False)
-pichu.detallesPokemon()
+treeko.detallesPokemon()
 
 
 
@@ -267,73 +267,173 @@ Roserade.detallesPokemon()
 pkmnlista= [mudkip,chimchar,pichu,treeko,Zapdos,Roserade]
 pkmnAtrapados= []
 
-Combate(Roserade,Zapdos)
+def Crear_rival():
+    nombrepacomon = input("Ingresa el nombre del enemigo: ")
+    desc = input("Ingresa la descipcion del pokemnon: ")
+    ata = int(input("Ingresa el ataque: "))
+    vid = int(input("Ingresa la vida: "))
+    defen = int(input("Ingresa el defensa: "))
+    level = int(input("Ingresa el nivel: "))
+    tipe = int(input("Cual es el tipo de pokemon?\n[1] Agua\n[2] Fuego\n[3]Electrico\n[4] Planta)\n"))
+    des = int(input("Cuantas evoluciones tiene? "))
 
-"""
-nombrepacomon = input("Ingresa el nombre del enemigo: ")
-desc = input("Ingresa la descipcion del pokemnon: ")
-ata = int(input("Ingresa el ataque: "))
-vid = int(input("Ingresa la vida: "))
-defen = int(input("Ingresa el defensa: "))
-level = int(input("Ingresa el nivel: "))
-tipe = int(input("Cual es el tipo de pokemon?\n[1] Agua\n[2] Fuego\n[3]Electrico\n[4] Planta)"))
-des = int(input("Cuantas evoluciones tiene? "))
+    if tipe == 1:
+        if des == 0:
+            pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+        elif des == 1 :
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+        elif des == 2:
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+            pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+    elif tipe == 2:
+        if des == 0:
+            pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+        elif des == 1 :
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+        elif des == 2:
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+            pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+    elif tipe == 3:
+        if des == 0:
+            pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+        elif des == 1 :
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+        elif des == 2:
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+            pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+    elif tipe == 4:
+        if des == 0:
+            pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
+        elif des == 1 :
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+        elif des == 2:
+            evo1 = input("Ingresa el nombre de la primera evolucion: ")
+            evo2 = input("Ingresa el nombre de la segunda evolucion: ")
+            pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
+    else:
+        print("Mi loco, elige una opcion valida")
 
-if tipe == 1:
-    if des == 0:
-        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
-    elif des == 1 :
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
+    pacomonEnemigo.detallesPokemon()
+    pkmnlista.append(pacomonEnemigo)
+    return pacomonEnemigo
+
+user = input("Bienvenido al simulador de PapuPokedex, Cual es tu nombre: ")
+print(f"Waichin, {user} vos no tenes pokemons ")
+print("[1] mudkip\n[2] Chimchar\n[3] Treeko\n[4] Pichu")
+poke_des = 0
+while poke_des < 1 or poke_des > 4:
+    poke_des = int(input("Cual elegis: "))
+    if poke_des == 1:
+        mudkip.atrapado = True
+        pkmnAtrapados.append(mudkip)
+        mudkip.detallesPokemon()
+    elif poke_des == 2:
+        chimchar.atrapado = True
+        pkmnAtrapados.append(chimchar)
+        chimchar.detallesPokemon()
+    elif poke_des == 3:
+        treeko.atrapado = True
+        pkmnAtrapados.append(treeko)
+        treeko.detallesPokemon()
+    elif poke_des == 4:
+        pichu.atrapado = True
+        pkmnAtrapados.append(pichu)
+        pichu.detallesPokemon()
+    else:
+        print("Eres o te haces?")
+
+print("MENU PRINCIPAL\n")
+print("[1] Mostrar pokemon atrapados")
+print("[2] Pokemon habla")
+print("[3] Entrenar")
+print("[4] Combatir")
+print("[5] Salir")
+des = 0
+while des != 5:
+    des = int(input("Que deseas hacer? "))
+    if des == 1:
+        for i in pkmnAtrapados:
+            i.detallesPokemon()
     elif des == 2:
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
-        pacomonEnemigo = Agua(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
-elif tipe == 2:
-    if des == 0:
-        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
-    elif des == 1 :
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
-    elif des == 2:
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
-        pacomonEnemigo = Fuego(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
-elif tipe == 3:
-    if des == 0:
-        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
-    elif des == 1 :
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
-    elif des == 2:
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
-        pacomonEnemigo = Electrico(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
-elif tipe == 4:
-    if des == 0:
-        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,3,"","",False)
-    elif des == 1 :
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,2,evo1,"",False)
-    elif des == 2:
-        evo1 = input("Ingresa el nombre de la primera evolucion: ")
-        evo2 = input("Ingresa el nombre de la segunda evolucion: ")
-        pacomonEnemigo = Planta(nombrepacomon,desc,ata,vid,defen,level,1,evo1,evo2,False)
-else:
-    print("Mi loco, elige una opcion valida")
-
-pacomonEnemigo.detallesPokemon()
-"""
-
-
-
-"""
-pikachu=Pokemon()
-pikachu.detallesPokemon()
-pikachu.next_evo="raichu"
-for i in range(12):
-    pikachu.entrenar()
-
-"""
-
-
+        for i, c in enumerate(pkmnAtrapados):
+            print(f"{i+1}. {c.nombre}")
+        select = int(input("Selecciona tu pokemon para hablar: "))
+        c.hablar()
+    elif des == 3:
+        for i, c in enumerate(pkmnAtrapados):
+            print(f"{i+1}. {c.nombre}")
+        select = int(input("Selecciona tu pokemon a entrenar: "))
+        print("\nMENU DE ENTRENAMIENTO")
+        print("[1] Entrenamiento normal")
+        print("[2] Entrenamiento individual")
+        print("[3] Entrenamiento intensivo")
+        print("[4] Entrenamiento personalizado")
+        subdes = int(input("Que tipo de entrenamiento deseas realizar? "))
+        if subdes == 1:
+            c.entrenar()
+        elif subdes == 2:
+            desx = int(input("Que atributo deseas mejorar? (1. Ataque, 2. Defensa, 3. Vida) "))
+            if desx == 1:
+                c.subirAtaque()
+                print(f"Ataque: [{c.ataque}]")
+            elif desx == 2:
+                c.subirDefensa()
+                print(f"Defensa: [{c.defensa}]")
+            elif desx == 3:
+                c.subirVida()
+                print(f"Vida: [{c.vida}]")
+            else:
+                print("Wacho elige bien")
+        elif subdes == 3:
+            c.boostAll()
+            print(f"Ataque: [{c.ataque}]")
+            print(f"Defensa: [{c.defensa}]")
+            print(f"Vida: [{c.vida}]")
+        elif subdes == 4:
+            desx = int(input("Que atributo deseas modificar? (1. Ataque, 2. Defensa, 3. Vida, 4. nivel)"))
+            if desx == 1:
+                nuevo = int(input("Ingresa el nuevo valor para el ataque: "))
+                c.ataque = nuevo
+                print(f"Ataque de {c.nombre}: [{c.ataque}]")
+            elif desx == 2:
+                nuevo = int(input("Ingresa el nuevo valor para el defensa: "))
+                c.defensa = nuevo
+                print(f"Defensa de {c.nombre}: [{c.ataque}]")
+            elif desx == 3:
+                nuevo = int(input("Ingresa el nuevo valor para el vida: "))
+                c.vida = nuevo
+                print(f"Vida de {c.nombre}: [{c.vida}]")
+            elif desx == 4:
+                nuevo = int(input("Ingresa el nuevo valor para el nivel: "))
+                c.lvl = nuevo
+                print(f"Nivel de {c.nombre}: [{c.lvl}]")
+            else:
+                print("Tu no aprendes verdad?")
+    elif des == 4:
+        for i, c in enumerate(pkmnAtrapados):
+            print(f"{i+1}. {c.nombre}")
+        select = int(input("Selecciona tu pokemon para combatir: "))
+        print("\nMENU DE SELECCION DE RIVAL")
+        print("[1] Elegir rival")
+        print("[2] Rival aleatorio")
+        print("[3] Crear rival")
+        subdes = int(input("Que eliges? "))
+        if subdes == 1:
+            for i, c in enumerate(pkmnlista):
+                print(f"{i+1}. {c.nombre}")
+            rival = int(input("Selecciona el pokemon a enfrentar: "))
+            Combate(pkmnAtrapados[select-1],pkmnlista[rival-1])
+        elif subdes == 2:
+            alazar = random.randrange(1,7)
+            Combate(pkmnAtrapados[select-1],pkmnlista[alazar-1])
+        elif subdes == 3:
+            Combate(pkmnAtrapados[select-1],Crear_rival())
+        else:
+            print("Otra vez?")
