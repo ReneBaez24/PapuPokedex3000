@@ -5,7 +5,6 @@ import random
 from rich.table import Table
 from rich.console import Console
 
-# Crear instancia de Console para las tablas
 console = Console()
 
 class Pokemon_Base(ABC):
@@ -56,7 +55,7 @@ class Pokemon(Pokemon_Base):
         table.add_row("Defensa", f"[blue]{self.defensa}[/blue]")
         table.add_row("Nivel", f"[magenta]{self.lvl}[/magenta]")
         table.add_row("Evolución", str(self.evolucion))
-        table.add_row("Atrapado", "✅ Sí" if self.atrapado else "❌ No")
+        table.add_row("Atrapado", "Sí" if self.atrapado else " No")
         
         console.print(table)
 
@@ -250,7 +249,7 @@ def Combate(pkmn1,pkmn2):
             faint= True
             print(f"El ganador del combate es {winner}") 
 
-#(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0,vida=0,defensa=0,lvl=0,evolucion=1,next_evo="",last_evo="",atrapado=False):
+
 mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
 mudkip.detallesPokemon()
 
@@ -330,7 +329,7 @@ def Crear_rival():
     return pacomonEnemigo
 
 user = input("Bienvenido al simulador de PapuPokedex, Cual es tu nombre: ")
-print(f"Waichin, {user} vos no tenes pokemons ")
+print(f"Es un placer, {user} no tienes pokemones ")
 print("[1] mudkip\n[2] Chimchar\n[3] Treeko\n[4] Pichu")
 poke_des = 0
 while poke_des < 1 or poke_des > 4:
@@ -354,14 +353,15 @@ while poke_des < 1 or poke_des > 4:
     else:
         print("Eres o te haces?")
 
-print("MENU PRINCIPAL\n")
-print("[1] Mostrar pokemon atrapados")
-print("[2] Pokemon habla")
-print("[3] Entrenar")
-print("[4] Combatir")
-print("[5] Salir")
+
 des = 0
 while des != 5:
+    print("\nMENU PRINCIPAL")
+    print("[1] Mostrar pokemon atrapados")
+    print("[2] Pokemon habla")
+    print("[3] Entrenar")
+    print("[4] Combatir")
+    print("[5] Salir")
     des = int(input("Que deseas hacer? "))
     if des == 1:
         for i in pkmnAtrapados:
@@ -395,7 +395,7 @@ while des != 5:
                 c.subirVida()
                 print(f"Vida: [{c.vida}]")
             else:
-                print("Wacho elige bien")
+                print("Error, opcion no valida")
         elif subdes == 3:
             c.boostAll()
             print(f"Ataque: [{c.ataque}]")
@@ -443,7 +443,7 @@ while des != 5:
         else:
             print("Otra vez?")
     elif des == 5:
-        print("adios joven hermoso")
+        print("Hasta la proxima. FIN DEL PROGRAMA")
         break
     else:
-        print("vales caca joven ")
+        print("Error elja una opcion valida ")
