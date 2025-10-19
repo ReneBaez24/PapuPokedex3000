@@ -2,6 +2,11 @@
 
 from abc import ABC, abstractmethod
 import random 
+from rich.table import Table
+from rich.console import Console
+
+# Crear instancia de Console para las tablas
+console = Console()
 
 class Pokemon_Base(ABC):
     def __init__(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0
@@ -34,28 +39,39 @@ class Pokemon(Pokemon_Base):
     def hablar(self):
         print(f"!{self.nombre}!")
 
-
-    #cambiar esta wea    
     def actualizar(self):
         print("eldiablo")
 
-    
     def detallesPokemon(self):
-        print(f"\n nombre del pokemon {self.nombre} ")
-        print(f"\n descripcion del pokemon {self.descripcion} ")
-        print(f"\n ataque del pokemon {self.ataque} ")
-        print(f"\n vida del pokemon {self.vida} ")
-        print(f"\n defensa del pokemon {self.defensa} ")
-        print(f"\n nivel del pokemon {self.lvl} ")
-        print(f"\n evolucion del pokemon {self.evolucion} ")
-        print(f"\n atrapado = {self.atrapado} ")
+        table = Table(title="🎮 DETALLES DEL POKÉMON 🎮", show_header=True, header_style="bold magenta")
+
+        
+        table.add_column("Atributo", style="cyan", width=20)
+        table.add_column("Valor", style="yellow", width=30)
+        
+        table.add_row("Nombre", str(self.nombre))
+        table.add_row("Descripción", str(self.descripcion))
+        table.add_row("Ataque", f"[red]{self.ataque}[/red]")
+        table.add_row("Vida", f"[green]{self.vida}[/green]")
+        table.add_row("Defensa", f"[blue]{self.defensa}[/blue]")
+        table.add_row("Nivel", f"[magenta]{self.lvl}[/magenta]")
+        table.add_row("Evolución", str(self.evolucion))
+        table.add_row("Atrapado", "✅ Sí" if self.atrapado else "❌ No")
+        
+        console.print(table)
 
     def detallesCombate(self):
-        print(f" nombre del pokemon {self.nombre} ")
-        print(f" ataque del pokemon {self.ataque} ")
-        print(f" vida del pokemon {self.vida} ")
-        print(f" defensa del pokemon {self.defensa} ")
-
+        table = Table(title="⚔️  DETALLES DE COMBATE ⚔️", show_header=True, header_style="bold red")
+        
+        table.add_column("Atributo", style="cyan", width=20)
+        table.add_column("Valor", style="yellow", width=30)
+         
+        table.add_row("Nombre", f"[bold]{self.nombre}[/bold]")
+        table.add_row("Ataque", f"[red bold]{self.ataque}[/red bold] 🗡️")
+        table.add_row("Vida", f"[green bold]{self.vida}[/green bold] ❤️")
+        table.add_row("Defensa", f"[blue bold]{self.defensa}[/blue bold] 🛡️")
+        
+        console.print(table)
 
     def entrenar(self):
         self.ataque+=10
@@ -68,7 +84,6 @@ class Pokemon(Pokemon_Base):
         print(f"vida del pokemon {self.vida} ")
         print(f"nivel del pokemon {self.lvl} ")
 
-
         if self.lvl >= 100:
             if self.evolucion < 3:
                 self.lvl=0
@@ -76,6 +91,7 @@ class Pokemon(Pokemon_Base):
                 print(f"la wea fome evoluciono y se convirtio en {self.next_evo}")
                 self.nombre=self.next_evo
                 self.next_evo=self.last_evo
+                
     def subirAtaque(self):
         self.ataque+=20
     def subirDefensa(self):
@@ -108,8 +124,6 @@ class Planta(Pokemon):
         super().__init__(nombre, descripcion, ataque, vida, defensa, lvl, evolucion, next_evo, last_evo, atrapado)
         self.ataque_especial ="rayo solar"
 
-
-
 class Entrenamiento(ABC):
     def __init__(self):
         pass
@@ -134,8 +148,6 @@ class Pokemon_Entrenamiento(Entrenamiento, Pokemon):
         self.defensa += 20
 
 def Combate(pkmn1,pkmn2):
-
-
     print(f"Pokemon {pkmn2.nombre} busca pelea! ")
     print("detalles de tu pokemon")
     pkmn1.detallesCombate()
@@ -146,10 +158,11 @@ def Combate(pkmn1,pkmn2):
     vidaCombate1=pkmn1.vida
     vidaCombate2=pkmn2.vida
     while faint == False :
-                
+        table = Table(title="⚔️ pokemon hp ⚔️", show_header= False, header_style="bold red")
+        table.add_row(f"[green bold]{pkmn1.nombre}: HP {vidaCombate1}❤️[/green bold]  vs [green bold]{pkmn2.nombre}: HP {vidaCombate2}❤️[/green bold] ")
 
-        print(f"{pkmn1.nombre}: HP [{vidaCombate1}]")
-        print(f"{pkmn2.nombre}: HP [{vidaCombate2}]")
+        console.print(table)
+
         huida=False
         while eleccion == 0:
             print(f"Opciones de combate ")
@@ -220,7 +233,6 @@ def Combate(pkmn1,pkmn2):
             elif rivalwea == 3:
                 print(f"{pkmn2.nombre} descansa y recupera 5 hp")
                 vidaCombate2+=5
-
         
         eleccion=0    
        
@@ -229,7 +241,7 @@ def Combate(pkmn1,pkmn2):
             print(f"El ganador del combate es {winner}")
             if pkmn1.vida > pkmn2.vida :
                 print("Capturaste al pokemon!")
-                pkmn2.atrapado == True
+                pkmn2.atrapado = True
                 pkmnAtrapados.append(pkmn2)
             else:
                 print("el pokemon se escapo (tu vida base era menor)")
@@ -237,11 +249,6 @@ def Combate(pkmn1,pkmn2):
         elif vidaCombate1 == 0:  
             faint= True
             print(f"El ganador del combate es {winner}") 
-
-
-
-
-    
 
 #(self,nombre="sin pokemon",descripcion="no descripcion",ataque=0,vida=0,defensa=0,lvl=0,evolucion=1,next_evo="",last_evo="",atrapado=False):
 mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
@@ -255,8 +262,6 @@ pichu.detallesPokemon()
 
 treeko=Planta("treeko","wea de planta",45,40,35,5,1,"pikachu","raichu",False)
 treeko.detallesPokemon()
-
-
 
 Zapdos=Electrico("Zapdos","Pajarraco Culiao",90,90,85,70,3,"","",False)
 Zapdos.detallesPokemon()
@@ -442,6 +447,3 @@ while des != 5:
         break
     else:
         print("vales caca joven ")
-    
-# Simulacrooo
-
