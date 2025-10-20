@@ -251,22 +251,22 @@ def Combate(pkmn1,pkmn2):
 
 
 mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
-mudkip.detallesPokemon()
+
 
 chimchar=Fuego("Chimchar","Macaco du Fogo",58,44,44,5,1,"Monferno","Infernape",False)
-chimchar.detallesPokemon()
+
 
 pichu=Electrico("pichu","rata electrica",40,20,35,5,1,"pikachu","raichu",False)
-pichu.detallesPokemon()
 
-treeko=Planta("treeko","wea de planta",45,40,35,5,1,"pikachu","raichu",False)
-treeko.detallesPokemon()
+
+treeko=Planta("treeko","wea de planta",45,40,35,5,1,"groovyle","sceptile",False)
+
 
 Zapdos=Electrico("Zapdos","Pajarraco Culiao",90,90,85,70,3,"","",False)
-Zapdos.detallesPokemon()
+
 
 Roserade=Planta("Roserade","Inserta musica de piano",125,60,105,74,3,"","",False)
-Roserade.detallesPokemon()
+
 
 pkmnlista= [mudkip,chimchar,pichu,treeko,Zapdos,Roserade]
 pkmnAtrapados= []
@@ -333,7 +333,7 @@ print(f"Es un placer, {user} no tienes pokemones ")
 print("[1] mudkip\n[2] Chimchar\n[3] Treeko\n[4] Pichu")
 poke_des = 0
 while poke_des < 1 or poke_des > 4:
-    poke_des = int(input("Cual elegis: "))
+    poke_des = int(input("Cual eliges: "))
     if poke_des == 1:
         mudkip.atrapado = True
         pkmnAtrapados.append(mudkip)
@@ -351,7 +351,7 @@ while poke_des < 1 or poke_des > 4:
         pkmnAtrapados.append(pichu)
         pichu.detallesPokemon()
     else:
-        print("Eres o te haces?")
+        print("elija una opcion valida?")
 
 
 des = 0
