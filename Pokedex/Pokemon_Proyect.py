@@ -1,4 +1,6 @@
 #saquenme de latinoamerica
+# CILANTRO
+# PEREJIL
 
 from abc import ABC, abstractmethod
 import random 
@@ -36,7 +38,7 @@ class Pokemon(Pokemon_Base):
         super().__init__(nombre, descripcion, ataque, vida, defensa, lvl, evolucion, next_evo, last_evo, atrapado)
 
     def hablar(self):
-        print(f"!{self.nombre}!")
+        print(f"\n!{self.nombre}!\n")
 
     def actualizar(self):
         print("eldiablo")
@@ -169,7 +171,15 @@ def Combate(pkmn1,pkmn2):
             print(f"[2] Ataque especial ")
             print(f"[3] Pasar turno ")
             print(f"[4] Huir ")
-            eleccion=int(input(""))
+            while(True):
+                try:
+                    eleccion=int(input(f"Que deberia hacer {pkmn1.nombre}?  "))
+                    if eleccion < 1 or eleccion > 4:
+                        print("ERROR. La opcion no es valida")
+                    else:
+                        break
+                except ValueError:
+                    print("ERROR. Ingresa un valor numerico valido")
 
             winner=""
             if eleccion == 1:
@@ -250,7 +260,7 @@ def Combate(pkmn1,pkmn2):
             print(f"El ganador del combate es {winner}") 
 
 
-mudkip=Agua("Mudkip","poquemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
+mudkip=Agua("Mudkip","pokemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
 
 
 chimchar=Fuego("Chimchar","Macaco du Fogo",58,44,44,5,1,"Monferno","Infernape",False)
@@ -274,12 +284,51 @@ pkmnAtrapados= []
 def Crear_rival():
     nombrepacomon = input("Ingresa el nombre del enemigo: ")
     desc = input("Ingresa la descipcion del pokemnon: ")
-    ata = int(input("Ingresa el ataque: "))
-    vid = int(input("Ingresa la vida: "))
-    defen = int(input("Ingresa el defensa: "))
-    level = int(input("Ingresa el nivel: "))
-    tipe = int(input("Cual es el tipo de pokemon?\n[1] Agua\n[2] Fuego\n[3]Electrico\n[4] Planta)\n"))
-    des = int(input("Cuantas evoluciones tiene? "))
+    while(True):
+        try:
+            ata = int(input("Ingresa el ataque: "))
+            break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
+    while(True):
+        try:
+            vid = int(input("Ingresa la vida: "))
+            break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
+    while(True):
+        try:
+            defen = int(input("Ingresa el defensa: "))
+            break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
+    while(True):
+        try:
+            level = int(input("Ingresa el nivel: "))
+            if level < 1 or level > 99:
+                print("ERROR. Ingresa un nivel valido (1-99)")
+            else:
+                break
+        except ValueError:
+            print("ERROR. EL valor ingresado es un decimal(No valido)")
+    while(True):
+        try:
+            tipe = int(input("Cual es el tipo de pokemon?\n[1] Agua\n[2] Fuego\n[3]Electrico\n[4] Planta)\n"))
+            if tipe < 1 or tipe > 4:
+                print("ERROR. Ingresa una de las opciones validas mencionadas")
+            else:
+                break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
+    while(True):
+        try:
+            des = int(input("Cuantas evoluciones tiene? "))
+            if tipe < 0 or tipe > 2:
+                print("ERROR. Ingresa una de las opciones validas(0-2)")
+            else:
+                break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
 
     if tipe == 1:
         if des == 0:
@@ -333,7 +382,12 @@ print(f"Es un placer, {user} no tienes pokemones ")
 print("[1] mudkip\n[2] Chimchar\n[3] Treeko\n[4] Pichu")
 poke_des = 0
 while poke_des < 1 or poke_des > 4:
-    poke_des = int(input("Cual eliges: "))
+    while(True):
+        try:
+            poke_des = int(input("Cual eliges: "))
+            break
+        except ValueError:
+            print("ERROR. Ingresa un valor numerico valido")
     if poke_des == 1:
         mudkip.atrapado = True
         pkmnAtrapados.append(mudkip)
@@ -351,7 +405,7 @@ while poke_des < 1 or poke_des > 4:
         pkmnAtrapados.append(pichu)
         pichu.detallesPokemon()
     else:
-        print("elija una opcion valida?")
+        print(f"ERROR. Numero no valido(Opcion {poke_des} no disponible)")
 
 
 des = 0
@@ -362,88 +416,212 @@ while des != 5:
     print("[3] Entrenar")
     print("[4] Combatir")
     print("[5] Salir")
-    des = int(input("Que deseas hacer? "))
+    while(True):
+        try:
+            des = int(input("Que deseas hacer? "))
+            break
+        except ValueError:
+            print("ERROR. Ingrese un valor numerico valido.")
     if des == 1:
         for i in pkmnAtrapados:
             i.detallesPokemon()
     elif des == 2:
-        for i, c in enumerate(pkmnAtrapados):
-            print(f"{i+1}. {c.nombre}")
-        select = int(input("Selecciona tu pokemon para hablar: "))
-        c.hablar()
+        while(True):
+            print("LISTA DE POKEMONES DISPONIBLES")
+            print("-" * 30)
+            for i, c in enumerate(pkmnAtrapados):
+                print(f"{i+1}. {c.nombre}")
+            print("Teclee [0] para regresar al menu principal")
+            tama = len(pkmnAtrapados)
+            while(True):
+                try:
+                    select = int(input("Selecciona tu pokemon para hablar: "))
+                    if select < 0 or select > tama:
+                        print(f"ERROR. El pokemon numero {select} no existe.")
+                    else:
+                        break
+                except ValueError:
+                    print("ERROR. Ingresa un valor numerico para elegir pokemon")
+            if select == 0:
+                break
+            c.hablar()
     elif des == 3:
+        print("LISTA DE POKEMONES DISPONIBLES")
+        print("-" * 30)
         for i, c in enumerate(pkmnAtrapados):
             print(f"{i+1}. {c.nombre}")
-        select = int(input("Selecciona tu pokemon a entrenar: "))
-        print("\nMENU DE ENTRENAMIENTO")
-        print("[1] Entrenamiento normal")
-        print("[2] Entrenamiento individual")
-        print("[3] Entrenamiento intensivo")
-        print("[4] Entrenamiento personalizado")
-        subdes = int(input("Que tipo de entrenamiento deseas realizar? "))
-        if subdes == 1:
-            c.entrenar()
-        elif subdes == 2:
-            desx = int(input("Que atributo deseas mejorar? (1. Ataque, 2. Defensa, 3. Vida) "))
-            if desx == 1:
-                c.subirAtaque()
+        tama = len(pkmnAtrapados)
+        while(True):
+            try:
+                select = int(input("Selecciona tu pokemon a entrenar: "))
+                if select < 1 or select > tama:
+                    print(f"ERROR. El pokemon numero {select} no existe.")
+                else:
+                    break
+            except ValueError:
+                print("ERROR. Ingresa un valor numerico para elegir pokemon")
+        while(True):
+            print("\nMENU DE ENTRENAMIENTO")
+            print("[1] Entrenamiento normal")
+            print("[2] Entrenamiento individual")
+            print("[3] Entrenamiento intensivo")
+            print("[4] Entrenamiento personalizado")
+            print("[0] Regresar al menu principal")
+            while(True):
+                try:
+                    subdes = int(input("Que tipo de entrenamiento deseas realizar? "))
+                    if subdes < 0 or subdes > 4:
+                        print("ERROR. Opcion de entrenamiento no valida.")
+                    else:
+                        break
+                except ValueError:
+                    print("ERROR. Ingrese un valor numerico valido")
+            if subdes == 0:
+                print("Regresando.....")
+                break
+            elif subdes == 1:
+                c.entrenar()
+            elif subdes == 2:
+                while(True):
+                    try:
+                        desx = int(input("Que atributo deseas mejorar? (1. Ataque, 2. Defensa, 3. Vida) "))
+                        if desx < 1 or desx > 3:
+                            print("ERROR. Atributo ingresado no valido")
+                        else:
+                            break
+                    except ValueError:
+                        print("ERROR. Ingrese un valor numerico valido")
+                if desx == 1:
+                    c.subirAtaque()
+                    print(f"Ataque: [{c.ataque}]")
+                elif desx == 2:
+                    c.subirDefensa()
+                    print(f"Defensa: [{c.defensa}]")
+                elif desx == 3:
+                    c.subirVida()
+                    print(f"Vida: [{c.vida}]")
+                else:
+                    print("Error, opcion no valida")
+            elif subdes == 3:
+                c.boostAll()
                 print(f"Ataque: [{c.ataque}]")
-            elif desx == 2:
-                c.subirDefensa()
                 print(f"Defensa: [{c.defensa}]")
-            elif desx == 3:
-                c.subirVida()
                 print(f"Vida: [{c.vida}]")
-            else:
-                print("Error, opcion no valida")
-        elif subdes == 3:
-            c.boostAll()
-            print(f"Ataque: [{c.ataque}]")
-            print(f"Defensa: [{c.defensa}]")
-            print(f"Vida: [{c.vida}]")
-        elif subdes == 4:
-            desx = int(input("Que atributo deseas modificar? (1. Ataque, 2. Defensa, 3. Vida, 4. nivel)"))
-            if desx == 1:
-                nuevo = int(input("Ingresa el nuevo valor para el ataque: "))
-                c.ataque = nuevo
-                print(f"Ataque de {c.nombre}: [{c.ataque}]")
-            elif desx == 2:
-                nuevo = int(input("Ingresa el nuevo valor para el defensa: "))
-                c.defensa = nuevo
-                print(f"Defensa de {c.nombre}: [{c.ataque}]")
-            elif desx == 3:
-                nuevo = int(input("Ingresa el nuevo valor para el vida: "))
-                c.vida = nuevo
-                print(f"Vida de {c.nombre}: [{c.vida}]")
-            elif desx == 4:
-                nuevo = int(input("Ingresa el nuevo valor para el nivel: "))
-                c.lvl = nuevo
-                print(f"Nivel de {c.nombre}: [{c.lvl}]")
-            else:
-                print("Tu no aprendes verdad?")
+            elif subdes == 4:
+                while(True):
+                    while(True):
+                        try:
+                            desx = int(input("Que atributo deseas modificar? (1. Ataque, 2. Defensa, 3. Vida, 4. nivel, 0. Regresar)"))
+                            if desx < 0 or desx > 4:
+                                print("ERROR. Opcion de atributo seleccionado no valido")
+                            else:
+                                break
+                        except ValueError:
+                            print("ERROR. Ingrese solo valores numericos enteros")
+                    if desx == 0:
+                        break
+                    elif desx == 1:
+                        while(True):
+                            try:
+                                nuevo = int(input("Ingresa el nuevo valor para el ataque: "))
+                                if nuevo < 1:
+                                    print("ERROR. Ingresa un valor numerico positivo")
+                                else:
+                                    c.ataque = nuevo
+                                    print(f"Ataque de {c.nombre}: [{c.ataque}]")
+                                    break
+                            except ValueError:
+                                print("ERROR. Ingresa un valor numerico valido")
+                    elif desx == 2:
+                        while(True):
+                            try:
+                                nuevo = int(input("Ingresa el nuevo valor para la defensa: "))
+                                if nuevo < 1:
+                                    print("ERROR. Ingresa un valor numerico positivo")
+                                else:
+                                    c.defensa = nuevo
+                                    print(f"Defensa de {c.nombre}: [{c.ataque}]")
+                                    break
+                            except ValueError:
+                                print("ERROR. Ingresa un valor numerico valido")
+                    elif desx == 3:
+                        while(True):
+                            try:
+                                nuevo = int(input("Ingresa el nuevo valor para la vida: "))
+                                if nuevo < 1:
+                                    print("ERROR. Ingresa un valor numerico positivo")
+                                else:
+                                    c.vida = nuevo
+                                    print(f"Vida de {c.nombre}: [{c.vida}]")
+                                    break
+                            except ValueError:
+                                print("ERROR. Ingresa un valor numerico valido")
+                    elif desx == 4:
+                        while(True):
+                            try:
+                                nuevo = int(input("Ingresa el nuevo valor del nivel (1-99): "))
+                                if nuevo < 1 or nuevo > 99:
+                                    print("ERROR. Ingresa un valor numerico en el rango dado")
+                                else:
+                                    c.lvl = nuevo
+                                    print(f"Nivel de {c.nombre}: [{c.lvl}]")
+                                    break
+                            except ValueError:
+                                print("ERROR. Ingresa un valor numerico valido")
+                    else:
+                        print("ERROR. Opcion no valida")
     elif des == 4:
         for i, c in enumerate(pkmnAtrapados):
             print(f"{i+1}. {c.nombre}")
-        select = int(input("Selecciona tu pokemon para combatir: "))
-        print("\nMENU DE SELECCION DE RIVAL")
-        print("[1] Elegir rival")
-        print("[2] Rival aleatorio")
-        print("[3] Crear rival")
-        subdes = int(input("Que eliges? "))
-        if subdes == 1:
-            for i, c in enumerate(pkmnlista):
-                print(f"{i+1}. {c.nombre}")
-            rival = int(input("Selecciona el pokemon a enfrentar: "))
-            Combate(pkmnAtrapados[select-1],pkmnlista[rival-1])
-        elif subdes == 2:
-            alazar = random.randrange(1,7)
-            Combate(pkmnAtrapados[select-1],pkmnlista[alazar-1])
-        elif subdes == 3:
-            Combate(pkmnAtrapados[select-1],Crear_rival())
-        else:
-            print("Otra vez?")
+        tama = len(pkmnAtrapados)
+        while(True):
+            try:
+                select = int(input("Selecciona tu pokemon para combatir: "))
+                if select < 1 or select > tama:
+                    print(f"ERROR. No existe el pokemon numero {select}")
+                else:
+                    break
+            except ValueError:
+                print("ERROR. Ingresa un valor numerico valido")
+        while(True):
+            print("\nMENU DE SELECCION DE RIVAL")
+            print("[1] Elegir rival")
+            print("[2] Rival aleatorio")
+            print("[3] Crear rival")
+            print("[0] Regresar")
+            while(True):
+                try:
+                    subdes = int(input("Que eliges? "))
+                    if subdes < 0 or subdes > 3:
+                        print("ERROR. Ingresa una opcion valida")
+                    else:
+                        break
+                except ValueError:
+                    print("ERROR. Ingresa un valor numerico valido")
+            if subdes == 0:
+                break
+            elif subdes == 1:
+                for i, c in enumerate(pkmnlista):
+                    print(f"{i+1}. {c.nombre}")
+                while(True):
+                    try:
+                        rival = int(input("Selecciona el pokemon a enfrentar: "))
+                        if rival < 1 or rival > len(pkmnlista):
+                            print(f"ERROR. No existe el rival numero {rival}")
+                        else:
+                            Combate(pkmnAtrapados[select-1],pkmnlista[rival-1])
+                            break
+                    except ValueError:
+                        print("ERROR. Ingresa un valor numerico valido")
+            elif subdes == 2:
+                alazar = random.randrange(1,7)
+                Combate(pkmnAtrapados[select-1],pkmnlista[alazar-1])
+            elif subdes == 3:
+                Combate(pkmnAtrapados[select-1],Crear_rival())
+            else:
+                print("Otra vez?")
     elif des == 5:
         print("Hasta la proxima. FIN DEL PROGRAMA")
         break
     else:
-        print("Error elja una opcion valida ")
+        print("ERROR. Elija una opcion valida")
