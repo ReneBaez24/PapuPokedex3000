@@ -62,17 +62,17 @@ class Pokemon(Pokemon_Base):
         console.print(table)
 
     def detallesCombate(self):
-        table = Table(title="⚔️  DETALLES DE COMBATE ⚔️", show_header=True, header_style="bold red")
+        tablecombate = Table(title="⚔️  DETALLES DE COMBATE ⚔️", show_header=True, header_style="bold red")
         
-        table.add_column("Atributo", style="cyan", width=20)
-        table.add_column("Valor", style="yellow", width=30)
+        tablecombate.add_column("Atributo", style="cyan", width=20)
+        tablecombate.add_column("Valor", style="yellow", width=30)
          
-        table.add_row("Nombre", f"[bold]{self.nombre}[/bold]")
-        table.add_row("Ataque", f"[red bold]{self.ataque}[/red bold] 🗡️")
-        table.add_row("Vida", f"[green bold]{self.vida}[/green bold] ❤️")
-        table.add_row("Defensa", f"[blue bold]{self.defensa}[/blue bold] 🛡️")
+        tablecombate.add_row("Nombre", f"[bold]{self.nombre}[/bold]")
+        tablecombate.add_row("Ataque", f"[red bold]{self.ataque}[/red bold] 🗡️")
+        tablecombate.add_row("Vida", f"[green bold]{self.vida}[/green bold] ❤️")
+        tablecombate.add_row("Defensa", f"[blue bold]{self.defensa}[/blue bold] 🛡️")
         
-        console.print(table)
+        console.print(tablecombate)
 
     def entrenar(self):
         self.ataque+=10
@@ -158,11 +158,10 @@ def Combate(pkmn1,pkmn2):
     eleccion=0
     vidaCombate1=pkmn1.vida
     vidaCombate2=pkmn2.vida
+    defensaCombate1=pkmn1.defensa
+    defensaCombate2=pkmn2.defensa
     while faint == False :
-        table = Table(title="⚔️ pokemon hp ⚔️", show_header= False, header_style="bold red")
-        table.add_row(f"[green bold]{pkmn1.nombre}: HP {vidaCombate1}❤️[/green bold]  vs [green bold]{pkmn2.nombre}: HP {vidaCombate2}❤️[/green bold] ")
-
-        console.print(table)
+        
 
         huida=False
         while eleccion == 0:
@@ -184,30 +183,41 @@ def Combate(pkmn1,pkmn2):
             winner=""
             if eleccion == 1:
                 print(f"{pkmn1.nombre} ataca! ")
-                dmg1=pkmn1.ataque - pkmn2.defensa
-                if dmg1<=0:
-                    dmg1=5
-                vidaCombate2-=dmg1
+                dmg1=pkmn1.ataque  
+                if defensaCombate2 > 0:
+                    defensaCombate2-=dmg1
+                    if defensaCombate2 < 0:
+                        residuo= abs(defensaCombate2)
+                        vidaCombate2-=residuo
+                        defensaCombate2 = 0
+                else :
+                    vidaCombate2-=dmg1
                 if vidaCombate2 <= 0:
                     vidaCombate2 = 0
                     winner=pkmn1.nombre
                     break
             elif eleccion == 2:
                 print(f"{pkmn1.nombre} realiza su ataque especial: {pkmn1.ataque_especial}! ")
-                dmg1=(pkmn1.ataque*1.5) - pkmn2.defensa
+                dmg1=(pkmn1.ataque*1.5) 
 
-                if dmg1<=0:
-                    dmg1=5
-                vidaCombate2-=dmg1
+                if defensaCombate2 > 0:
+                    defensaCombate2-=dmg1
+                    if defensaCombate2 < 0:
+                        residuo= abs(defensaCombate2)
+                        vidaCombate2-=residuo
+                        defensaCombate2 = 0
+                else :
+                    vidaCombate2-=dmg1
                 if vidaCombate2 <= 0:
                     vidaCombate2 = 0
                     winner=pkmn1.nombre
+                    faint= True
                     break
             elif eleccion == 3:
                 print(f"{pkmn1.nombre} descansa y recupera 5 hp")
                 vidaCombate1+=5
             elif eleccion ==4:
-                huir=random.randrange(3)
+                huir=random.randrange(5)
                 if huir != 1:
                     print(f"huiste de la batalla")
                     huida=True
@@ -222,29 +232,48 @@ def Combate(pkmn1,pkmn2):
             rivalwea=random.randrange(1,4)
             if rivalwea ==1:
                 print(f"{pkmn2.nombre} ataca! ")
-                dmg2=pkmn2.ataque - pkmn1.defensa
-                if dmg2<=0:
-                    dmg2=5
-                vidaCombate1-=dmg2
+                dmg2=pkmn2.ataque
+
+                if defensaCombate1 > 0:
+                    defensaCombate1-=dmg2
+                    if defensaCombate1 < 0:
+                        residuo= abs(defensaCombate1)
+                        vidaCombate1-=residuo
+                        defensaCombate1 = 0
+                else :
+                    vidaCombate1-=dmg2
                 if vidaCombate1 <= 0:
                     vidaCombate1 = 0
                     winner=pkmn2.nombre
+        
             elif rivalwea == 2:
-                    print(f"{pkmn2.nombre} realiza su ataque especial: {pkmn2.ataque_especial}! ")
-                    dmg2=(pkmn2.ataque*1.5) - pkmn1.defensa
-
-                    if dmg2<=0:
-                        dmg2=5
+                print(f"{pkmn2.nombre} realiza su ataque especial: {pkmn2.ataque_especial}! ")
+                dmg2=(pkmn2.ataque*1.5) 
+                if defensaCombate1 > 0:
+                    defensaCombate1-=dmg2
+                    if defensaCombate1 < 0:
+                        residuo= abs(defensaCombate1)
+                        vidaCombate1-=residuo
+                        defensaCombate1 = 0
+                else :
                     vidaCombate1-=dmg2
-                    if vidaCombate1 <= 0:
-                        vidaCombate1 = 0
-                        winner=pkmn2.nombre
+                if vidaCombate1 <= 0:
+                    vidaCombate1 = 0
+                    winner=pkmn2.nombre
+                    
             elif rivalwea == 3:
                 print(f"{pkmn2.nombre} descansa y recupera 5 hp")
                 vidaCombate2+=5
         
         eleccion=0    
-       
+        
+        table = Table(title="⚔️ pokemon hp ⚔️", show_header=True, header_style="bold magenta")
+        table.add_column("Jugador", style="cyan", width=40)
+        table.add_column("Rival", style="yellow", width=40)
+        
+        table.add_row(f"[green bold]{pkmn1.nombre}: HP {vidaCombate1}❤️[/green bold]  Def {defensaCombate1}🛡️", f"[green bold]{pkmn2.nombre}: HP {vidaCombate2}❤️[/green bold]  Def {defensaCombate2}🛡️")
+        
+        console.print(table)
         if vidaCombate2 == 0:
             faint= True
             print(f"El ganador del combate es {winner}")
@@ -258,6 +287,7 @@ def Combate(pkmn1,pkmn2):
         elif vidaCombate1 == 0:  
             faint= True
             print(f"El ganador del combate es {winner}") 
+        
 
 
 mudkip=Agua("Mudkip","pokemon aguado",70,50,50,5,1,"marshtomp","swampert",False)
@@ -323,7 +353,7 @@ def Crear_rival():
     while(True):
         try:
             des = int(input("Cuantas evoluciones tiene? "))
-            if tipe < 0 or tipe > 2:
+            if des < 0 or des > 2:
                 print("ERROR. Ingresa una de las opciones validas(0-2)")
             else:
                 break
@@ -540,7 +570,7 @@ while des != 5:
                                     print("ERROR. Ingresa un valor numerico positivo")
                                 else:
                                     c.defensa = nuevo
-                                    print(f"Defensa de {c.nombre}: [{c.ataque}]")
+                                    print(f"Defensa de {c.nombre}: [{c.defensa}]")
                                     break
                             except ValueError:
                                 print("ERROR. Ingresa un valor numerico valido")
