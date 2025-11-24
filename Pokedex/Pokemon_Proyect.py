@@ -6,6 +6,8 @@ from abc import ABC, abstractmethod
 import random 
 from rich.table import Table
 from rich.console import Console
+import sqlite3
+import datetime
 
 console = Console()
 
@@ -407,45 +409,312 @@ def Crear_rival():
     pkmnlista.append(pacomonEnemigo)
     return pacomonEnemigo
 
-user = input("Bienvenido al simulador de PapuPokedex, Cual es tu nombre: ")
-print(f"Es un placer, {user} no tienes pokemones ")
-print("[1] mudkip\n[2] Chimchar\n[3] Treeko\n[4] Pichu")
-poke_des = 0
-while poke_des < 1 or poke_des > 4:
-    while(True):
+class PokedexBD:
+    def __init__(self, conexion, cursor):
+        self.conexion = conexion
+        self.cursor = cursor
+
+    def crearTabla(self):
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tabla_partidas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT NOT NULL,
+            nombre TEXT NOT NULL,
+            pk_Inicial TEXT NOT NULL
+        )
+        """)
+        
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pokemones_atrapados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            partida_id INTEGER NOT NULL,
+            nombre TEXT NOT NULL,
+            descripcion TEXT,
+            ataque INTEGER,
+            vida INTEGER,
+            defensa INTEGER,
+            lvl INTEGER,
+            evolucion INTEGER,
+            next_evo TEXT,
+            last_evo TEXT,
+            tipo TEXT NOT NULL,
+            FOREIGN KEY (partida_id) REFERENCES tabla_partidas(id)
+        )
+        """)
+        self.conexion.commit()
+    
+    def guardar_partida(self, nombre, pkh):
+        fecha = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.cursor.execute("INSERT INTO tabla_partidas (fecha, nombre, pk_Inicial) VALUES (?,?,?)", 
+                          (fecha, nombre, pkh))
+        self.conexion.commit()
+        print("PARTIDA GUARDADA.\n")
+        return self.cursor.lastrowid
+    
+    def guardar_pokemon(self, partida_id, pokemon):
+        tipo = type(pokemon).__name__
+        
+        self.cursor.execute("""
+            INSERT INTO pokemones_atrapados 
+            (partida_id, nombre, descripcion, ataque, vida, defensa, lvl, evolucion, next_evo, last_evo, tipo)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?)
+        """, (partida_id, pokemon.nombre, pokemon.descripcion, pokemon.ataque, 
+              pokemon.vida, pokemon.defensa, pokemon.lvl, pokemon.evolucion, 
+              pokemon.next_evo, pokemon.last_evo, tipo))
+        self.conexion.commit()
+    
+    def eliminar_pokemones_partida(self, partida_id):
+        self.cursor.execute("DELETE FROM pokemones_atrapados WHERE partida_id = ?", (partida_id,))
+        self.conexion.commit()
+    
+    def cargar_pokemones(self, partida_id):
+        self.cursor.execute("""
+            SELECT nombre, descripcion, ataque, vida, defensa, lvl, evolucion, next_evo, last_evo, tipo
+            FROM pokemones_atrapados 
+            WHERE partida_id = ?
+        """, (partida_id,))
+        return self.cursor.fetchall()
+    
+    def eliminar_partida(self, partida_id):
+        self.cursor.execute("DELETE FROM pokemones_atrapados WHERE partida_id = ?", (partida_id,))
+        self.cursor.execute("DELETE FROM tabla_partidas WHERE id = ?", (partida_id,))
+        self.conexion.commit()
+        print("PARTIDA ELIMINADA.\n")
+
+
+def cargar_partida_guardada(partidas, tabla):
+    print("\n" + "="*30)
+    print("PARTIDAS GUARDADAS")
+    print("="*30)
+    
+    for i, partida in enumerate(partidas):
+        print(f"[{i+1}] ID: {partida[0]} | Fecha: {partida[1]}")
+        print(f"    Jugador: {partida[2]} | Pokemon inicial: {partida[3]}")
+        print("-"*60)
+    
+    while True:
         try:
-            poke_des = int(input("Cual eliges: "))
-            break
+            seleccion = int(input("\nSelecciona el número de partida a cargar (0 para cancelar): "))
+            if seleccion == 0:
+                return None, []
+            if seleccion < 1 or seleccion > len(partidas):
+                print(f"ERROR. Selecciona una opción válida (1-{len(partidas)})")
+            else:
+                break
         except ValueError:
-            print("ERROR. Ingresa un valor numerico valido")
-    if poke_des == 1:
-        mudkip.atrapado = True
-        pkmnAtrapados.append(mudkip)
-        mudkip.detallesPokemon()
-    elif poke_des == 2:
-        chimchar.atrapado = True
-        pkmnAtrapados.append(chimchar)
-        chimchar.detallesPokemon()
-    elif poke_des == 3:
-        treeko.atrapado = True
-        pkmnAtrapados.append(treeko)
-        treeko.detallesPokemon()
-    elif poke_des == 4:
-        pichu.atrapado = True
-        pkmnAtrapados.append(pichu)
-        pichu.detallesPokemon()
-    else:
-        print(f"ERROR. Numero no valido(Opcion {poke_des} no disponible)")
+            print("ERROR. Ingresa un valor numérico válido")
+    
+    partida_seleccionada = partidas[seleccion - 1]
+    partida_id = partida_seleccionada[0]
+    nombre_jugador = partida_seleccionada[2]
+    
+    pokemones_guardados = tabla.cargar_pokemones(partida_id)
+    pkmnAtrapados_cargados = []
+    
+    print(f"\nCargando partida de {nombre_jugador}...")
+    
+    for pkmn_data in pokemones_guardados:
+        nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, tipo = pkmn_data
+        
+        if tipo == "Agua":
+            pkmn = Agua(nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, True)
+        elif tipo == "Fuego":
+            pkmn = Fuego(nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, True)
+        elif tipo == "Electrico":
+            pkmn = Electrico(nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, True)
+        elif tipo == "Planta":
+            pkmn = Planta(nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, True)
+        else:
+            continue
+        
+        pkmnAtrapados_cargados.append(pkmn)
+    
+    print(f"PARTIDA CARGADA")
+    print(f"Pokemones cargados: {len(pkmnAtrapados_cargados)}")
+    
+    return partida_id, pkmnAtrapados_cargados
+
+def crear_nueva_partida(tabla):
+    print("\n" + "="*30)
+    print("CREAR NUEVA PARTIDA")
+    print("="*30)
+    
+    name = input("\nIngresa tu nombre: ")
+    print("\nLISTA DE POKEMONES A ELEGIR")
+    print("="*35)
+    print("[1] Mudkip")
+    print("[2] Chimchar")
+    print("[3] Treeko")
+    print("[4] Pichu")
+    
+    poke_des = 0
+    pokemon_inicial = ""
+    pokemon_elegido = None
+    
+    while poke_des < 1 or poke_des > 4:
+        try:
+            poke_des = int(input("\n¿Cuál eliges?: "))
+        except ValueError:
+            print("ERROR. Ingresa un valor numérico válido")
+            continue
+            
+        if poke_des == 1:
+            mudkip.atrapado = True
+            pokemon_elegido = mudkip
+            pokemon_inicial = "Mudkip"
+            mudkip.detallesPokemon()
+            break
+        elif poke_des == 2:
+            chimchar.atrapado = True
+            pokemon_elegido = chimchar
+            pokemon_inicial = "Chimchar"
+            chimchar.detallesPokemon()
+            break
+        elif poke_des == 3:
+            treeko.atrapado = True
+            pokemon_elegido = treeko
+            pokemon_inicial = "Treeko"
+            treeko.detallesPokemon()
+            break
+        elif poke_des == 4:
+            pichu.atrapado = True
+            pokemon_elegido = pichu
+            pokemon_inicial = "Pichu"
+            pichu.detallesPokemon()
+            break
+        else:
+            print(f"ERROR. Opción {poke_des} no disponible")
+    
+    partida_id = tabla.guardar_partida(name, pokemon_inicial)
+    print(f"\nPartida creada. ID: {partida_id}")
+    print(f"Que empiezen los juegos, {name}!\n")
+    
+    return partida_id, [pokemon_elegido]
+
+# INICIO
+
+conexion = sqlite3.connect("pokedex.db")
+cursor = conexion.cursor()
+tabla = PokedexBD(conexion, cursor)
+tabla.crearTabla()
+cursor.execute("SELECT * FROM tabla_partidas")
+partidas = cursor.fetchall()
+
+partida_actual_id = None
+pkmnAtrapados = []
+
+if len(partidas) == 0:
+    print("\n" + "="*30)
+    print("BIENVENIDO")
+    print("="*30)
+    print("\nNo hay partidas guardadas.")
+    
+    while True:
+        des = input("\n¿Quieres iniciar una nueva partida? (s/n): ").lower()
+        if des == "s":
+            partida_actual_id, pkmnAtrapados = crear_nueva_partida(tabla)
+            break
+        elif des == "n":
+            print("\n¡Hasta luego!")
+            conexion.close()
+            exit()
+        else:
+            print("ERROR. Ingresa 's' para sí o 'n' para no")
+else:
+    print("\n" + "="*30)
+    print("BIENVENIDO")
+    print("="*30)
+    print(f"\nSe encontraron {len(partidas)} partida(s) guardada(s)")
+    
+    while True:
+        print("\n" + "="*60)
+        print("MENU DE INICIO")
+        print("="*60)
+        print("[1] Cargar partida existente")
+        print("[2] Crear nueva partida")
+        print("[3] Eliminar partida")
+        print("[0] Salir")
+        try:
+            opcion_inicio = int(input("\n¿Qué deseas hacer?: "))
+        except ValueError:
+            print("ERROR. Ingresa un valor numérico válido")
+            continue
+
+        if opcion_inicio == 1:
+            partida_actual_id, pkmnAtrapados = cargar_partida_guardada(partidas, tabla)
+            if partida_actual_id is not None:
+                break
+            else:
+                print("\nCarga cancelada")
+                
+        elif opcion_inicio == 2:
+            partida_actual_id, pkmnAtrapados = crear_nueva_partida(tabla)
+            break
+            
+        elif opcion_inicio == 3:
+            print("\n" + "="*30)
+            print("ELIMINAR PARTIDA")
+            print("="*30)
+            
+            for i, partida in enumerate(partidas):
+                print(f"[{i+1}] ID: {partida[0]} | Jugador: {partida[2]} | Fecha: {partida[1]}")
+            
+            try:
+                seleccion = int(input("\nSelecciona el número de partida a eliminar (0 para cancelar): "))
+                if seleccion == 0:
+                    continue
+                if seleccion < 1 or seleccion > len(partidas):
+                    print(f"ERROR. Selecciona una opción válida (1-{len(partidas)})")
+                    continue
+                
+                confirmacion = input(f"\n¿Estás seguro de eliminar esta partida? (s/n): ").lower()
+                if confirmacion == "s":
+                    partida_id_eliminar = partidas[seleccion - 1][0]
+                    tabla.eliminar_partida(partida_id_eliminar)
+                    cursor.execute("SELECT * FROM tabla_partidas")
+                    partidas = cursor.fetchall()
+                    if len(partidas) == 0:
+                        print("\nNo quedan partidas guardadas.")
+                        des = input("¿Quieres crear una nueva partida? (s/n): ").lower()
+                        if des == "s":
+                            partida_actual_id, pkmnAtrapados = crear_nueva_partida(tabla)
+                            break
+                        else:
+                            print("\nNos vemos")
+                            conexion.close()
+                            exit()
+                else:
+                    print("Eliminación cancelada")
+            except ValueError:
+                print("ERROR. Ingresa un valor numérico válido")
+                
+        elif opcion_inicio == 0:
+            print("\nNos vemos")
+            conexion.close()
+            exit()
+        else:
+            print("ERROR. Selecciona una opción válida")
 
 
+if partida_actual_id is None or len(pkmnAtrapados) == 0:
+    print("\nERROR. No se pudo iniciar el programa")
+    conexion.close()
+    exit()
+
+print("\n" + "="*30)
+print("QUE EMPIEZE EL JUEGO")
+print("="*30)
+
+conta = 0
 des = 0
-while des != 5:
+while(True):
     print("\nMENU PRINCIPAL")
     print("[1] Mostrar pokemon atrapados")
     print("[2] Pokemon habla")
     print("[3] Entrenar")
     print("[4] Combatir")
-    print("[5] Salir")
+    print("[5] Guardar partida")
+    print("[6] Salir")
     while(True):
         try:
             des = int(input("Que deseas hacer? "))
@@ -651,6 +920,33 @@ while des != 5:
             else:
                 print("Otra vez?")
     elif des == 5:
+        if partida_actual_id is not None:
+            print("\nGuardando progreso...")
+            tabla.eliminar_pokemones_partida(partida_actual_id)
+            for pokemon in pkmnAtrapados:
+                tabla.guardar_pokemon(partida_actual_id, pokemon)
+            print(f"Progreso guardado")
+            print(f"Pokemones guardados: {len(pkmnAtrapados)}")
+            conta = 1
+        else:
+            print("ERROR. No hay una partida activa.")
+    elif des == 6:
+        des2 = "s"
+        while(True):
+            if conta == 0:
+                des2 = input("Seguro que quieres salir sin guardar? (s/n): ")
+                if des2 == "s":
+                    tabla.eliminar_partida(partida_actual_id)
+                    break
+                elif des2 == "n":
+                    break
+                else:
+                    print("ERROR. Ingresa una opcion valida")
+                    continue
+            else:
+                break
+        if des2 == "n":
+            continue
         print("Hasta la proxima. FIN DEL PROGRAMA")
         break
     else:
