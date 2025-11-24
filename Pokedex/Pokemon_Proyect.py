@@ -9,6 +9,8 @@ from rich.console import Console
 import sqlite3
 import datetime
 
+conta = 0
+
 console = Console()
 
 class Pokemon_Base(ABC):
@@ -642,6 +644,7 @@ else:
 
         if opcion_inicio == 1:
             partida_actual_id, pkmnAtrapados = cargar_partida_guardada(partidas, tabla)
+            conta = 1
             if partida_actual_id is not None:
                 break
             else:
@@ -705,8 +708,7 @@ print("\n" + "="*30)
 print("QUE EMPIEZE EL JUEGO")
 print("="*30)
 
-conta = 0
-des = 0
+des = 99
 while(True):
     print("\nMENU PRINCIPAL")
     print("[1] Mostrar pokemon atrapados")
@@ -714,7 +716,8 @@ while(True):
     print("[3] Entrenar")
     print("[4] Combatir")
     print("[5] Guardar partida")
-    print("[6] Salir")
+    print("[6] prueva de manejo de errores")
+    print("[0] Salir")
     while(True):
         try:
             des = int(input("Que deseas hacer? "))
@@ -930,7 +933,95 @@ while(True):
             conta = 1
         else:
             print("ERROR. No hay una partida activa.")
+        
     elif des == 6:
+        while(True):
+            print("\n=== PRUEBAS DE MANEJO DE ERRORES ===")
+            print("[1] Division por cero")
+            print("[2] Acceso a indice fuera de rango")
+            print("[3] Conversion de tipo invalida")
+            print("[4] Acceso a atributo inexistente")
+            print("[5] Operacion con pokemon sin atributo especial")
+            print("[6] Error de tipo en operaciones")
+            print("[0] Regresar al menu principal")
+
+            while(True):
+                try:
+                    prueba = int(input("Selecciona la prueba de error: "))
+                    if prueba < 0 or prueba > 6:
+                        print("ERROR. Selecciona una opcion valida")
+                    else:
+                        break
+                except ValueError:
+                    print("ERROR. Ingresa un valor numerico valido")
+            
+            if prueba == 0:
+                print("Regresando al menu principal...")
+                break
+            elif prueba == 1:
+                try:
+                    print("\n[PRUEBA 1: Division por cero]")
+                    print("Intentando dividir el ataque de un pokemon entre 0...")
+                    resultado = pkmnAtrapados[0].ataque / 0
+                    print(f"Resultado: {resultado}")
+                except ZeroDivisionError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: No se puede dividir entre cero")
+                    print("Manejo: La operacion fue cancelada y el programa continua normalmente")
+            elif prueba == 2:
+                try:
+                    print("\n[PRUEBA 2: Acceso a indice fuera de rango]")
+                    print(f"Intentando acceder al pokemon en la posicion 999...")
+                    pokemon_inexistente = pkmnAtrapados[999]
+                    print(f"Pokemon: {pokemon_inexistente.nombre}")
+                except IndexError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: El indice solicitado no existe en la lista")
+                    print(f"Manejo: Se verifico que solo existen {len(pkmnAtrapados)} pokemon(s) atrapado(s)")
+            elif prueba == 3:
+                try:
+                    print("\n[PRUEBA 3: Conversion de tipo invalida]")
+                    print("Intentando convertir el nombre del pokemon a numero...")
+                    numero = int(pkmnAtrapados[0].nombre)
+                    print(f"Numero: {numero}")
+                except ValueError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: No se puede convertir un texto a numero")
+                    print(f"Manejo: El nombre '{pkmnAtrapados[0].nombre}' permanece como texto")
+            elif prueba == 4:
+                try:
+                    print("\n[PRUEBA 4: Acceso a atributo inexistente]")
+                    print("Intentando acceder a un atributo que no existe...")
+                    atributo_falso = pkmnAtrapados[0].poder_magico_supremo
+                    print(f"Atributo: {atributo_falso}")
+                except AttributeError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: El pokemon no tiene ese atributo")
+                    print(f"Manejo: Se confirma que {pkmnAtrapados[0].nombre} solo tiene atributos validos")
+            elif prueba == 5:      
+                try:
+                    print("\n[PRUEBA 5: Operacion con pokemon sin ataque especial]")
+                    print("Creando un pokemon base sin ataque especial...")
+                    pokemon_base = Pokemon("TestMon","Pokemon de prueba",50,50,50,10,1,"","",True)
+                    print(f"Intentando usar ataque especial de {pokemon_base.nombre}...")
+                    print(f"Ataque especial: {pokemon_base.ataque_especial}")
+                except AttributeError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: El pokemon base no tiene ataque especial definido")
+                    print(f"Manejo: Solo los pokemon de tipo especifico (Agua, Fuego, etc) tienen ataques especiales")
+            elif prueba == 6:
+                try:
+                    print("\n[PRUEBA 6: Error de tipo en operaciones]")
+                    print("Intentando sumar el ataque del pokemon con su nombre...")
+                    resultado = pkmnAtrapados[0].ataque + pkmnAtrapados[0].nombre
+                    print(f"Resultado: {resultado}")
+                except TypeError as e:
+                    print(f"ERROR CAPTURADO: {type(e).__name__}")
+                    print(f"Descripcion: No se puede realizar operaciones aritmeticas entre numeros y texto")
+                    print(f"Manejo: El ataque ({pkmnAtrapados[0].ataque}) y el nombre ('{pkmnAtrapados[0].nombre}') son tipos incompatibles")
+            
+            print("\n=== FIN DE LA PRUEBA ===")
+    elif des == 0:
         des2 = "s"
         while(True):
             if conta == 0:
