@@ -8,6 +8,9 @@ from rich.table import Table
 from rich.console import Console
 import sqlite3
 import datetime
+from datetime import datetime
+import os
+
 
 conta = 0
 
@@ -48,20 +51,20 @@ class Pokemon(Pokemon_Base):
         print("eldiablo")
 
     def detallesPokemon(self):
-        table = Table(title="🎮 DETALLES DEL POKÉMON 🎮", show_header=True, header_style="bold magenta")
+        table = Table(title="🎮 DETALLES DEL POKEMON 🎮", show_header=True, header_style="bold magenta")
 
         
         table.add_column("Atributo", style="cyan", width=20)
         table.add_column("Valor", style="yellow", width=30)
         
         table.add_row("Nombre", str(self.nombre))
-        table.add_row("Descripción", str(self.descripcion))
+        table.add_row("Descripcion", str(self.descripcion))
         table.add_row("Ataque", f"[red]{self.ataque}[/red]")
         table.add_row("Vida", f"[green]{self.vida}[/green]")
         table.add_row("Defensa", f"[blue]{self.defensa}[/blue]")
         table.add_row("Nivel", f"[magenta]{self.lvl}[/magenta]")
-        table.add_row("Evolución", str(self.evolucion))
-        table.add_row("Atrapado", "Sí" if self.atrapado else " No")
+        table.add_row("Evolucion", str(self.evolucion))
+        table.add_row("Atrapado", "Si" if self.atrapado else " No")
         
         console.print(table)
 
@@ -151,23 +154,102 @@ class Pokemon_Entrenamiento(Entrenamiento, Pokemon):
         self.vida+= 20
     def subirDefensa(self):
         self.defensa += 20
+class RegistroCombate:
+    def __init__(self):
+        self.log = [] 
+        self.fecha_hora = datetime.now().strftime("%d-%m-%Y %H:%M")
+        self.nombre_archivo = f"batalla_{datetime.now().strftime('%d-%m-%y_%H-%M')}.txt"
+    
+    def agregar_turno(self, turno, accion_jugador, accion_rival, stats_jugador, stats_rival):
+        self.log.append(f"== TURNO {turno} ==")
+        self.log.append(accion_jugador)
+        self.log.append(f"Stats del Pokemon Enemigo: Vida {stats_rival['vida']}, Defensa {stats_rival['defensa']}")
+        self.log.append(accion_rival)
+        self.log.append(f"Stats de mi Pokemon: Vida {stats_jugador['vida']}, Defensa {stats_jugador['defensa']}")
+        self.log.append("")
+    
+    def guardar_combate(self, entrenador, pokemon_jugador, pokemon_rival, resultado):
+        try:
+            with open(self.nombre_archivo, 'w', encoding='utf-8') as archivo:
+                archivo.write("=== COMBATE ===\n")
+                archivo.write(f"Entrenador: {entrenador}\n")
+                archivo.write(f"pokemon: {pokemon_jugador.nombre}\n")
+                archivo.write(f"detalles: Ataque={pokemon_jugador.ataque}, Vida={pokemon_jugador.vida}, Defensa={pokemon_jugador.defensa}\n")
+                archivo.write(f"enemigo: {pokemon_rival.nombre}\n")
+                archivo.write(f"detalles enemigo: Ataque={pokemon_rival.ataque}, Vida={pokemon_rival.vida}, Defensa={pokemon_rival.defensa}\n")
+                archivo.write("\n")
+                
+                for linea in self.log:
+                    archivo.write(linea + "\n")
+                
+                archivo.write(f"Resultado: {resultado}\n")
+                archivo.write(f"Fecha y hora de la batalla: {self.fecha_hora}\n")
+                archivo.write("-" * 25)
+            
+            print(f"Combate guardado en: {self.nombre_archivo}")
+            return True
+        except IOError as e:
+            print(f"Error al guardar el combate: {e}")
+            return False
 
-def Combate(pkmn1,pkmn2):
+def leer_registro_combate():
+    print("REGISTROS DE COMBATE")
+    archivos = [f for f in os.listdir() if f.startswith("batalla_") and f.endswith(".txt")]
+    
+    if not archivos:
+        print("No se encontraron registros de combate.")
+        return
+    
+    print("Archivos disponibles:")
+    for i, archivo in enumerate(archivos, 1):
+        print(f"[{i}] {archivo}")
+    
+    try:
+        seleccion = int(input("selecciona el numero del archivo a leer (0 para cancelar): "))
+        if seleccion == 0:
+            return
+        
+        if seleccion < 1 or seleccion > len(archivos):
+            print("eliga una opcion valida")
+            return
+        
+        archivo_seleccionado = archivos[seleccion - 1]
+        
+        try:
+            with open(archivo_seleccionado, 'r', encoding='utf-8') as archivo:
+                contenido = archivo.read()
+                print("\n" + "="*50)
+                print(contenido)
+                print("="*50)
+        except FileNotFoundError:
+            print("FileNotFoundError: Archivo no encontrado.")
+        except IOError:
+            print("IOError: No se pudo leer el archivo.")
+            
+    except ValueError:
+        print("ValueError ingresa un numero valido weon")
+
+def Combate(pkmn1, pkmn2):
+    registro = RegistroCombate()
     print(f"Pokemon {pkmn2.nombre} busca pelea! ")
     print("detalles de tu pokemon")
     pkmn1.detallesCombate()
     print("detalles del pokemon rival")
     pkmn2.detallesCombate()
     faint = False
-    eleccion=0
-    vidaCombate1=pkmn1.vida
-    vidaCombate2=pkmn2.vida
-    defensaCombate1=pkmn1.defensa
-    defensaCombate2=pkmn2.defensa
-    while faint == False :
+    eleccion = 0
+    vidaCombate1 = pkmn1.vida
+    vidaCombate2 = pkmn2.vida
+    defensaCombate1 = pkmn1.defensa
+    defensaCombate2 = pkmn2.defensa
+    turno = 1
+    resultado = ""
+    
+    while faint == False:
+        huida = False
+        accion_jugador = ""
+        accion_rival = ""
         
-
-        huida=False
         while eleccion == 0:
             print(f"Opciones de combate ")
             print(f"[1] Ataque normal")
@@ -176,7 +258,7 @@ def Combate(pkmn1,pkmn2):
             print(f"[4] Huir ")
             while(True):
                 try:
-                    eleccion=int(input(f"Que deberia hacer {pkmn1.nombre}?  "))
+                    eleccion = int(input(f"Que deberia hacer {pkmn1.nombre}?  "))
                     if eleccion < 1 or eleccion > 4:
                         print("ERROR. La opcion no es valida")
                     else:
@@ -184,92 +266,133 @@ def Combate(pkmn1,pkmn2):
                 except ValueError:
                     print("ERROR. Ingresa un valor numerico valido")
 
-            winner=""
+            winner = ""
             if eleccion == 1:
-                print(f"{pkmn1.nombre} ataca! ")
-                dmg1=pkmn1.ataque  
+                dmg1 = pkmn1.ataque
+                print(f"{pkmn1.nombre} usa ataque normal\n{pkmn2.nombre} recibe ataque de {dmg1}! ")
+                
+                accion_jugador = f"{pkmn1.nombre} usa ataque normal\n{pkmn2.nombre} recibe ataque de {dmg1}"
+                
                 if defensaCombate2 > 0:
-                    defensaCombate2-=dmg1
+                    defensaCombate2 -= dmg1
                     if defensaCombate2 < 0:
-                        residuo= abs(defensaCombate2)
-                        vidaCombate2-=residuo
+                        residuo = abs(defensaCombate2)
+                        vidaCombate2 -= residuo
                         defensaCombate2 = 0
-                else :
-                    vidaCombate2-=dmg1
+                else:
+                    vidaCombate2 -= dmg1
+                    
+                accion_jugador += f"\nDaño de ataque: {dmg1}"
+                
                 if vidaCombate2 <= 0:
                     vidaCombate2 = 0
-                    winner=pkmn1.nombre
-                    break
+                    winner = pkmn1.nombre
+                    resultado = f"Has ganado el combate!"
+                    faint = True
+                   
+                    
             elif eleccion == 2:
-                print(f"{pkmn1.nombre} realiza su ataque especial: {pkmn1.ataque_especial}! ")
-                dmg1=(pkmn1.ataque*1.5) 
+                dmg1 = (pkmn1.ataque * 1.5)
+                print(f"{pkmn1.nombre} usa ataque especial\n{pkmn2.nombre} recibe ataque de {dmg1}! ")
+                
+                accion_jugador = f"{pkmn1.nombre} usa ataque especial\n{pkmn2.nombre} recibe ataque de {dmg1}"
 
                 if defensaCombate2 > 0:
-                    defensaCombate2-=dmg1
+                    defensaCombate2 -= dmg1
                     if defensaCombate2 < 0:
-                        residuo= abs(defensaCombate2)
-                        vidaCombate2-=residuo
+                        residuo = abs(defensaCombate2)
+                        vidaCombate2 -= residuo
                         defensaCombate2 = 0
-                else :
-                    vidaCombate2-=dmg1
+                else:
+                    vidaCombate2 -= dmg1
+                    
+                accion_jugador += f"\nDaño de ataque: {dmg1}"
+                
                 if vidaCombate2 <= 0:
                     vidaCombate2 = 0
-                    winner=pkmn1.nombre
-                    faint= True
-                    break
+                    winner = pkmn1.nombre
+                    resultado = f"Has ganado el combate!"
+                    faint = True
+                    
+                    
             elif eleccion == 3:
                 print(f"{pkmn1.nombre} descansa y recupera 5 hp")
-                vidaCombate1+=5
-            elif eleccion ==4:
-                huir=random.randrange(5)
+                vidaCombate1 += 5
+                accion_jugador = f"{pkmn1.nombre} descansa y recupera 5 hp"
+                
+            elif eleccion == 4:
+                huir = random.randrange(5)
                 if huir != 1:
                     print(f"huiste de la batalla")
-                    huida=True
+                    huida = True
+                    resultado = "Huida del combate"
+                    faint = True
                 else:
-                    print("llora")
+                    print("No pudiste huir (llora)") 
+                    accion_jugador = f"{pkmn1.nombre} intenta huir pero falla"
 
-        if huida == True:
-            faint= True
+        if huida:
+            registro.guardar_combate(user, pkmn1, pkmn2, resultado)
             return
-        if vidaCombate2 > 0:
+            
+        if vidaCombate2 > 0 and not faint:
             print(f"Turno del rival")
-            rivalwea=random.randrange(1,4)
-            if rivalwea ==1:
-                print(f"{pkmn2.nombre} ataca! ")
-                dmg2=pkmn2.ataque
+            rivalwea = random.randrange(1, 4)
+            
+            if rivalwea == 1:
+                dmg2 = pkmn2.ataque
+                print(f"{pkmn2.nombre} usa ataque normal\n{pkmn1.nombre} recibe ataque de {dmg2}")
+                
+                accion_rival = f"{pkmn2.nombre} usa ataque normal\n{pkmn1.nombre} recibe ataque de {dmg2}"
 
                 if defensaCombate1 > 0:
-                    defensaCombate1-=dmg2
+                    defensaCombate1 -= dmg2
                     if defensaCombate1 < 0:
-                        residuo= abs(defensaCombate1)
-                        vidaCombate1-=residuo
+                        residuo = abs(defensaCombate1)
+                        vidaCombate1 -= residuo
                         defensaCombate1 = 0
-                else :
-                    vidaCombate1-=dmg2
+                else:
+                    vidaCombate1 -= dmg2
+                    
                 if vidaCombate1 <= 0:
                     vidaCombate1 = 0
-                    winner=pkmn2.nombre
-        
+                    winner = pkmn2.nombre
+                    resultado = "Haz perdido el combate"
+                    faint = True
+
             elif rivalwea == 2:
-                print(f"{pkmn2.nombre} realiza su ataque especial: {pkmn2.ataque_especial}! ")
-                dmg2=(pkmn2.ataque*1.5) 
+                dmg2 = (pkmn2.ataque * 1.5)
+                print(f"{pkmn2.nombre} realiza su ataque especial: {pkmn2.ataque_especial}\n{pkmn1.nombre} recibe ataque de {dmg2}! ")
+                
+                accion_rival = f"{pkmn2.nombre} usa ataque especial: {pkmn2.ataque_especial}\n{pkmn1.nombre} recibe ataque de {dmg2}"
+                
                 if defensaCombate1 > 0:
-                    defensaCombate1-=dmg2
+                    defensaCombate1 -= dmg2
                     if defensaCombate1 < 0:
-                        residuo= abs(defensaCombate1)
-                        vidaCombate1-=residuo
+                        residuo = abs(defensaCombate1)
+                        vidaCombate1 -= residuo
                         defensaCombate1 = 0
-                else :
-                    vidaCombate1-=dmg2
+                else:
+                    vidaCombate1 -= dmg2
+                    
                 if vidaCombate1 <= 0:
                     vidaCombate1 = 0
-                    winner=pkmn2.nombre
+                    winner = pkmn2.nombre
+                    resultado = "Haz perdido el combate"
+                    faint = True
                     
             elif rivalwea == 3:
                 print(f"{pkmn2.nombre} descansa y recupera 5 hp")
-                vidaCombate2+=5
+                vidaCombate2 += 5
+                accion_rival = f"{pkmn2.nombre} descansa y recupera 5 hp"
+
         
-        eleccion=0    
+        if accion_jugador :
+            stats_jugador = {"vida": vidaCombate1, "defensa": defensaCombate1}
+            stats_rival = {"vida": vidaCombate2, "defensa": defensaCombate2}
+            registro.agregar_turno(turno, accion_jugador, accion_rival, stats_jugador, stats_rival)
+            turno += 1
+        eleccion = 0
         
         table = Table(title="⚔️ pokemon hp ⚔️", show_header=True, header_style="bold magenta")
         table.add_column("Jugador", style="cyan", width=40)
@@ -278,19 +401,26 @@ def Combate(pkmn1,pkmn2):
         table.add_row(f"[green bold]{pkmn1.nombre}: HP {vidaCombate1}❤️[/green bold]  Def {defensaCombate1}🛡️", f"[green bold]{pkmn2.nombre}: HP {vidaCombate2}❤️[/green bold]  Def {defensaCombate2}🛡️")
         
         console.print(table)
+        
         if vidaCombate2 == 0:
-            faint= True
-            print(f"El ganador del combate es {winner}")
-            if pkmn1.vida > pkmn2.vida :
+            faint = True
+            print(f"El ganador del combate es {pkmn1.nombre}")
+            if pkmn1.vida > pkmn2.vida:
                 print("Capturaste al pokemon!")
                 pkmn2.atrapado = True
                 pkmnAtrapados.append(pkmn2)
+                resultado = f"¡Victoria!, Has derrotado al Pokemon enemigo y lo has atrapado!"
             else:
                 print("el pokemon se escapo (tu vida base era menor)")
+                resultado = "¡Victoria!, Has derrotado al Pokemon enemigo pero no lo atrapaste"
 
         elif vidaCombate1 == 0:  
-            faint= True
-            print(f"El ganador del combate es {winner}") 
+            faint = True
+            print(f"El ganador del combate es {pkmn2.nombre}")
+            resultado = "Derrota, tu Pokemon fue debilitado"
+    
+    
+    registro.guardar_combate(user, pkmn1, pkmn2, resultado)
         
 
 
@@ -496,15 +626,15 @@ def cargar_partida_guardada(partidas, tabla):
     
     while True:
         try:
-            seleccion = int(input("\nSelecciona el número de partida a cargar (0 para cancelar): "))
+            seleccion = int(input("\nSelecciona el numero de partida a cargar (0 para cancelar): "))
             if seleccion == 0:
                 return None, []
             if seleccion < 1 or seleccion > len(partidas):
-                print(f"ERROR. Selecciona una opción válida (1-{len(partidas)})")
+                print(f"ERROR. Selecciona una opcion valida (1-{len(partidas)})")
             else:
                 break
         except ValueError:
-            print("ERROR. Ingresa un valor numérico válido")
+            print("ERROR. Ingresa un valor numerico valido")
     
     partida_seleccionada = partidas[seleccion - 1]
     partida_id = partida_seleccionada[0]
@@ -514,7 +644,8 @@ def cargar_partida_guardada(partidas, tabla):
     pkmnAtrapados_cargados = []
     
     print(f"\nCargando partida de {nombre_jugador}...")
-    
+    global user 
+    user = nombre_jugador
     for pkmn_data in pokemones_guardados:
         nombre, desc, ataque, vida, defensa, lvl, evo, next_evo, last_evo, tipo = pkmn_data
         
@@ -540,8 +671,9 @@ def crear_nueva_partida(tabla):
     print("\n" + "="*30)
     print("CREAR NUEVA PARTIDA")
     print("="*30)
-    
+    global user
     name = input("\nIngresa tu nombre: ")
+    user = name
     print("\nLISTA DE POKEMONES A ELEGIR")
     print("="*35)
     print("[1] Mudkip")
@@ -555,9 +687,9 @@ def crear_nueva_partida(tabla):
     
     while poke_des < 1 or poke_des > 4:
         try:
-            poke_des = int(input("\n¿Cuál eliges?: "))
+            poke_des = int(input("\n¿Cual eliges?: "))
         except ValueError:
-            print("ERROR. Ingresa un valor numérico válido")
+            print("ERROR. Ingresa un valor numerico valido")
             continue
             
         if poke_des == 1:
@@ -585,7 +717,7 @@ def crear_nueva_partida(tabla):
             pichu.detallesPokemon()
             break
         else:
-            print(f"ERROR. Opción {poke_des} no disponible")
+            print(f"ERROR. Opcion {poke_des} no disponible")
     
     partida_id = tabla.guardar_partida(name, pokemon_inicial)
     print(f"\nPartida creada. ID: {partida_id}")
@@ -593,7 +725,6 @@ def crear_nueva_partida(tabla):
     
     return partida_id, [pokemon_elegido]
 
-# INICIO
 
 conexion = sqlite3.connect("pokedex.db")
 cursor = conexion.cursor()
@@ -604,6 +735,8 @@ partidas = cursor.fetchall()
 
 partida_actual_id = None
 pkmnAtrapados = []
+
+
 
 if len(partidas) == 0:
     print("\n" + "="*30)
@@ -621,7 +754,7 @@ if len(partidas) == 0:
             conexion.close()
             exit()
         else:
-            print("ERROR. Ingresa 's' para sí o 'n' para no")
+            print("ERROR. Ingresa 's' para si o 'n' para no")
 else:
     print("\n" + "="*30)
     print("BIENVENIDO")
@@ -637,9 +770,9 @@ else:
         print("[3] Eliminar partida")
         print("[0] Salir")
         try:
-            opcion_inicio = int(input("\n¿Qué deseas hacer?: "))
+            opcion_inicio = int(input("\n¿Que deseas hacer?: "))
         except ValueError:
-            print("ERROR. Ingresa un valor numérico válido")
+            print("ERROR. Ingresa un valor numerico valido")
             continue
 
         if opcion_inicio == 1:
@@ -663,14 +796,14 @@ else:
                 print(f"[{i+1}] ID: {partida[0]} | Jugador: {partida[2]} | Fecha: {partida[1]}")
             
             try:
-                seleccion = int(input("\nSelecciona el número de partida a eliminar (0 para cancelar): "))
+                seleccion = int(input("\nSelecciona el numero de partida a eliminar (0 para cancelar): "))
                 if seleccion == 0:
                     continue
                 if seleccion < 1 or seleccion > len(partidas):
-                    print(f"ERROR. Selecciona una opción válida (1-{len(partidas)})")
+                    print(f"ERROR. Selecciona una opcion valida (1-{len(partidas)})")
                     continue
                 
-                confirmacion = input(f"\n¿Estás seguro de eliminar esta partida? (s/n): ").lower()
+                confirmacion = input(f"\n¿Estas seguro de eliminar esta partida? (s/n): ").lower()
                 if confirmacion == "s":
                     partida_id_eliminar = partidas[seleccion - 1][0]
                     tabla.eliminar_partida(partida_id_eliminar)
@@ -687,16 +820,16 @@ else:
                             conexion.close()
                             exit()
                 else:
-                    print("Eliminación cancelada")
+                    print("Eliminacion cancelada")
             except ValueError:
-                print("ERROR. Ingresa un valor numérico válido")
+                print("ERROR. Ingresa un valor numerico valido")
                 
         elif opcion_inicio == 0:
             print("\nNos vemos")
             conexion.close()
             exit()
         else:
-            print("ERROR. Selecciona una opción válida")
+            print("ERROR. Selecciona una opcion valida")
 
 
 if partida_actual_id is None or len(pkmnAtrapados) == 0:
@@ -709,6 +842,7 @@ print("QUE EMPIEZE EL JUEGO")
 print("="*30)
 
 des = 99
+
 while(True):
     print("\nMENU PRINCIPAL")
     print("[1] Mostrar pokemon atrapados")
@@ -717,6 +851,7 @@ while(True):
     print("[4] Combatir")
     print("[5] Guardar partida")
     print("[6] prueva de manejo de errores")
+    print("[7] Registros de batallas")
     print("[0] Salir")
     while(True):
         try:
@@ -1021,6 +1156,8 @@ while(True):
                     print(f"Manejo: El ataque ({pkmnAtrapados[0].ataque}) y el nombre ('{pkmnAtrapados[0].nombre}') son tipos incompatibles")
             
             print("\n=== FIN DE LA PRUEBA ===")
+    elif des == 7:
+        leer_registro_combate()
     elif des == 0:
         des2 = "s"
         while(True):
